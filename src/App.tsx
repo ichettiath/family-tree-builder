@@ -1,7 +1,8 @@
 import React from "react";
+import FamilyTree from "./components/FamilyTree/FamilyTree";
 
 function App() {
-   return <h1>init</h1>;
+   return <FamilyTree />;
 }
 
 export default App;
