@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Node, ExtNode } from "relatives-tree/lib/types";
 import ReactFamilyTree from "react-family-tree";
 import PinchZoomPan from "../PinchZoomPan/PinchZoomPan";
@@ -8,12 +8,17 @@ import css from "./FamilyTree.module.css";
 const WIDTH = 70;
 const HEIGHT = 80;
 
+export interface Info {
+   name: String;
+   dateOfBirth: Date;
+   isLiving: boolean;
+}
+
 const FamilyTree = () => {
-   // const [nodes, setNodes] = useState<Array<Node>>([]);
-   const [myId, setMyId] = useState<string>("");
    const [rootId, setRootId] = useState<string>("");
    const [curID, setCurID] = useState<number>(1);
    const [nodeMap, setNodeMap] = useState<Map<number, Node>>(new Map());
+   const [infoMap, setInfoMap] = useState<Map<number, Info>>(new Map());
 
    const initializeTree = (): void => {
       const node = {
@@ -30,8 +35,19 @@ const FamilyTree = () => {
          return newMap;
       });
       setRootId(node.id);
-      setMyId(node.id);
       setCurID(curID + 1);
+
+      const info = {
+         name: "isaac",
+         age: 22,
+         dateOfBirth: new Date("2001-09-26"),
+         isLiving: true
+      } as Info;
+      setInfoMap((prevState) => {
+         const newMap = new Map(prevState);
+         newMap.set(curID, info);
+         return newMap;
+      });
    };
 
    return (
@@ -52,6 +68,7 @@ const FamilyTree = () => {
                      <FamilyNode
                         key={node.id}
                         node={node}
+                        info={infoMap.get(Number(node.id))}
                         style={{
                            width: WIDTH,
                            height: HEIGHT,
