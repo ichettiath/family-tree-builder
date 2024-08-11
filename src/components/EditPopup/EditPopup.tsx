@@ -7,40 +7,52 @@ import {
    Button,
    TextField
 } from "@mui/material";
+import { Info } from "../FamilyTree/FamilyTree";
 
 interface EditPopupProps {
    isOpen: boolean;
    onClose: () => void;
-   onSubmit: (name: string) => void;
+   onAdd: (info: Info, type: string) => void;
+   onEdit: (info: Info) => void;
 }
 
-const EditPopup = ({ isOpen, onClose, onSubmit }: EditPopupProps) => {
-   const [showForm, setShowForm] = useState<string | null>(null);
+const EditPopup = ({ isOpen, onClose, onEdit, onAdd }: EditPopupProps) => {
+   const [formType, setFormType] = useState<string>("");
    const [name, setName] = useState<string>("");
-
-   const handleOptionClick = (option: string) => {
-      setShowForm(option);
-   };
 
    const handleFormSubmit = (event: React.FormEvent) => {
       event.preventDefault();
-      onSubmit(name);
+      if (name === "") return;
+      if (formType === "edit") onEdit({ name: name } as Info);
+      else onAdd({ name: name } as Info, formType);
       setName("");
-      setShowForm(null);
+      setFormType("");
       onClose();
    };
 
    return (
-      <Dialog open={isOpen} onClose={onClose}>
+      <Dialog
+         open={isOpen}
+         onClose={() => {
+            if (formType) setFormType("");
+            else onClose();
+         }}
+      >
          <DialogTitle>Options</DialogTitle>
          <DialogContent>
-            {showForm === null ? (
+            {formType === "" ? (
                <>
-                  <Button onClick={() => handleOptionClick("edit")}>
+                  <Button onClick={() => setFormType("edit")}>
                      Edit Member
                   </Button>
-                  <Button onClick={() => handleOptionClick("add")}>
+                  <Button onClick={() => setFormType("partner")}>
                      Add Partner
+                  </Button>
+                  <Button onClick={() => setFormType("child")}>
+                     Add Child
+                  </Button>
+                  <Button onClick={() => setFormType("parent")}>
+                     Add Parent
                   </Button>
                </>
             ) : (
@@ -55,7 +67,7 @@ const EditPopup = ({ isOpen, onClose, onSubmit }: EditPopupProps) => {
                   />
                   <DialogActions>
                      <Button type="submit">Submit</Button>
-                     <Button onClick={() => setShowForm(null)}>Cancel</Button>
+                     <Button onClick={() => setFormType("")}>Cancel</Button>
                   </DialogActions>
                </form>
             )}

@@ -10,8 +10,6 @@ const HEIGHT = 80;
 
 export interface Info {
    name: String;
-   dateOfBirth: Date;
-   isLiving: boolean;
 }
 
 const FamilyTree = () => {
@@ -38,16 +36,23 @@ const FamilyTree = () => {
       setCurID(curID + 1);
 
       const info = {
-         name: "isaac",
-         age: 22,
-         dateOfBirth: new Date("2001-09-26"),
-         isLiving: true
+         name: "isaac"
       } as Info;
       setInfoMap((prevState) => {
          const newMap = new Map(prevState);
          newMap.set(curID, info);
          return newMap;
       });
+   };
+
+   const handleAdd = (info: Info, type: string, id: number) => {
+      console.log(info, type);
+      console.log(nodeMap.get(id));
+   };
+
+   const handleEdit = (info: Info, id: number) => {
+      console.log(info);
+      console.log(nodeMap.get(id));
    };
 
    return (
@@ -69,6 +74,8 @@ const FamilyTree = () => {
                         key={node.id}
                         node={node}
                         info={infoMap.get(Number(node.id))}
+                        handleAdd={handleAdd}
+                        handleEdit={handleEdit}
                         style={{
                            width: WIDTH,
                            height: HEIGHT,

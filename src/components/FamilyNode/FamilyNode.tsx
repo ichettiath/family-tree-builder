@@ -9,14 +9,18 @@ interface FamilyNodeProps {
    node: ExtNode;
    style?: React.CSSProperties;
    info: Info | undefined;
+   handleAdd: (info: Info, type: string, id: number) => void;
+   handleEdit: (info: Info, id: number) => void;
 }
 
-const FamilyNode = ({ node, style, info }: FamilyNodeProps) => {
+const FamilyNode = ({
+   node,
+   style,
+   info,
+   handleAdd,
+   handleEdit
+}: FamilyNodeProps) => {
    const [isOpen, setIsOpen] = useState<boolean>(false);
-
-   const handleSubmit = (name: string) => {
-      console.log("Submitted name:", name);
-   };
 
    return (
       <div className={css.root} style={style} title={node.id}>
@@ -29,7 +33,8 @@ const FamilyNode = ({ node, style, info }: FamilyNodeProps) => {
          <EditPopup
             isOpen={isOpen}
             onClose={() => setIsOpen(false)}
-            onSubmit={handleSubmit}
+            onAdd={(info, type) => handleAdd(info, type, Number(node.id))}
+            onEdit={(info) => handleEdit(info, Number(node.id))}
          />
       </div>
    );
