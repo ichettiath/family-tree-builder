@@ -1,0 +1,41 @@
+.edit-form {
+   display: none;
+   text-align: center;
+   position: absolute;
+   border: 1px solid #aeaeae;
+   width: 300px;
+   background-color: #f57c00;
+   z-index: 10000;
+}
+
+.edit-form-title {
+   padding: 10px 0;
+   background-color: #039be5;
+   color: #ffffff;
+}
+
+.edit-form-content {
+   padding: 10px;
+}
+
+.form-group {
+   padding: 10px 0;
+}
+
+.form-label {
+   color: #ffffff;
+   width: 50px;
+   display: inline-block;
+}
+
+.form-input {
+   background-color: #ffca28;
+}
+
+.form-buttons {
+   padding: 5px 0 15px 0;
+}
+
+.form-button {
+   width: 108px;
+}

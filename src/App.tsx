@@ -1,8 +1,8 @@
 import React from "react";
-import FamilyTree from "./components/FamilyTree/FamilyTree";
+import Tree from "./components/Tree";
 
 function App() {
-   return <FamilyTree />;
+   return <Tree nodes={[{ id: 0, name: "Click Me", gender: "female" }]} />;
 }
 
 export default App;
