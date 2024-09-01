@@ -41,6 +41,13 @@ editForm.prototype.init = function (obj) {
       }
       that.hide();
    });
+
+   this.addParentButton.addEventListener("click", function () {
+      if (that.addParentCallback) {
+         that.addParentCallback(that.nodeId);
+      }
+      that.hide();
+   });
 };
 
 editForm.prototype.setAddPartnerCallback = function (callback) {
@@ -49,6 +56,9 @@ editForm.prototype.setAddPartnerCallback = function (callback) {
 
 editForm.prototype.setAddChildCallback = function (callback) {
    this.addChildCallback = callback;
+};
+editForm.prototype.setAddParentCallback = function (callback) {
+   this.addParentCallback = callback;
 };
 
 editForm.prototype.show = function (nodeId) {

@@ -39,10 +39,8 @@ const Tree: React.FC<TreeProps> = ({ nodes }) => {
             id: uniqueId,
             fid: parentId,
             name: "child",
-            gender: "female",
             mid: mid
          });
-         console.log(family.nodes);
       }
    };
 
@@ -56,8 +54,7 @@ const Tree: React.FC<TreeProps> = ({ nodes }) => {
          family.addPartnerNode({
             id: uniqueId,
             pids: [partnerId],
-            name: "partner",
-            gender: "male"
+            name: "partner"
          });
          if (family.nodes[partnerId].childrenIds) {
             const childrenIds = family.nodes[partnerId].childrenIds;
@@ -76,7 +73,40 @@ const Tree: React.FC<TreeProps> = ({ nodes }) => {
                }
                return prevMap;
             });
-            console.log(family.nodes);
+         }
+      }
+   };
+
+   const handleAddParent = (childId: number) => {
+      const family = familyRef.current;
+      if (family && childId) {
+         const uniqueId = parseInt(
+            uuidv4().split("-").join("").substring(0, 12),
+            16
+         );
+         if (family.nodes[childId].fid) {
+            const parentId = Number(family.nodes[childId].fid);
+            let childrenIds: (string | number)[] = [];
+            if (family.nodes[parentId].childrenIds) {
+               childrenIds = family.nodes[parentId].childrenIds ?? [];
+            }
+            family.addPartnerAndParentNodes(parentId, childrenIds, {
+               id: uniqueId,
+               pids: [parentId],
+               name: "parent"
+            });
+            setPartnetMap((prevMap) => {
+               if (prevMap) {
+                  prevMap.set(parentId, uniqueId);
+                  prevMap.set(uniqueId, parentId);
+               }
+               return prevMap;
+            });
+         } else {
+            family.addParentNode(childId, "fid", {
+               id: uniqueId,
+               name: "parent"
+            });
          }
       }
    };
@@ -86,6 +116,7 @@ const Tree: React.FC<TreeProps> = ({ nodes }) => {
          const editFormInstance = new editForm();
          editFormInstance.setAddPartnerCallback(handleAddPartner);
          editFormInstance.setAddChildCallback(handleAddChild);
+         editFormInstance.setAddParentCallback(handleAddParent);
 
          const familyInstance = new FamilyTree(treeRef.current, {
             mouseScrool: FamilyTree.action.none,
@@ -94,7 +125,8 @@ const Tree: React.FC<TreeProps> = ({ nodes }) => {
                field_0: "name",
                field_1: "id"
             },
-            nodes: nodes
+            nodes: nodes,
+            toolbar: { expandAll: true }
          });
          familyRef.current = familyInstance;
       }
