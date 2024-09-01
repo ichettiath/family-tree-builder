@@ -15,106 +15,76 @@ interface Node {
    children?: number[];
 }
 
-type NodeMap = Map<number, Node>;
-
 type TreeProps = {
    nodes: Node[];
 };
 
 const Tree: React.FC<TreeProps> = ({ nodes }) => {
-   const [nodeMap, setNodeMap] = useState<NodeMap>(
-      new Map([[0, { id: 0, name: "Click Me", gender: "" }]])
-   );
    const treeRef = useRef<HTMLDivElement | null>(null);
    const familyRef = useRef<FamilyTree | null>(null);
-
-   // const handleAddPartner = (nodeId: number) => {
-   //    console.log(nodeMap);
-   //    const newId = nodeMap.size;
-   //    const node = nodeMap.get(nodeId);
-
-   //    if (node) {
-   //       const updatedNodeMap = new Map(nodeMap);
-
-   //       if (node.pids && node.pids.length > 0) return;
-
-   //       updatedNodeMap.set(nodeId, {
-   //          ...node,
-   //          pids: [newId]
-   //       });
-
-   //       updatedNodeMap.set(newId, {
-   //          id: newId,
-   //          name: "Click Me",
-   //          gender: "",
-   //          pids: [nodeId]
-   //       });
-
-   //       setNodeMap(updatedNodeMap);
-   //    }
-   // };
-
-   // const handleAddChild = (nodeId: number) => {
-   //    const newId = nodeMap.size;
-   //    const node = nodeMap.get(nodeId);
-
-   //    if (node) {
-   //       const updatedNodeMap = new Map(nodeMap);
-
-   //       updatedNodeMap.set(nodeId, {
-   //          ...node,
-   //          children: [newId]
-   //       });
-
-   //       if (node.pids && node.pids.length > 0) {
-   //          const partnerId = node.pids[0];
-   //          const partner = nodeMap.get(partnerId);
-   //          if (partner) {
-   //             updatedNodeMap.set(partnerId, {
-   //                ...partner,
-   //                children: [newId]
-   //             });
-   //          }
-   //          updatedNodeMap.set(newId, {
-   //             id: newId,
-   //             name: "Click Me",
-   //             gender: "",
-   //             fid: nodeId,
-   //             mid: partnerId
-   //          });
-   //       } else {
-   //          updatedNodeMap.set(newId, {
-   //             id: newId,
-   //             name: "Click Me",
-   //             gender: "",
-   //             fid: nodeId
-   //          });
-   //       }
-
-   //       setNodeMap(updatedNodeMap);
-   //    }
-   // };
+   const [partnerMap, setPartnetMap] = useState<Map<number, number>>(new Map());
 
    const handleAddChild = (parentId: number) => {
       const family = familyRef.current;
-      if (family && parentId != null) {
+      if (family && partnerMap.has(parentId) && parentId != null) {
          const uniqueId = parseInt(
             uuidv4().split("-").join("").substring(0, 12),
             16
          );
+         let mid = null;
+         if (partnerMap.has(parentId)) {
+            mid = partnerMap.get(parentId);
+         }
          family.addChildNode({
             id: uniqueId,
             fid: parentId,
             name: "child",
-            gender: "female"
+            gender: "female",
+            mid: mid
          });
+         console.log(family.nodes);
+      }
+   };
+
+   const handleAddPartner = (partnerId: number) => {
+      const family = familyRef.current;
+      if (family && partnerId != null && !partnerMap.has(partnerId)) {
+         const uniqueId = parseInt(
+            uuidv4().split("-").join("").substring(0, 12),
+            16
+         );
+         family.addPartnerNode({
+            id: uniqueId,
+            pids: [partnerId],
+            name: "partner",
+            gender: "male"
+         });
+         if (family.nodes[partnerId].childrenIds) {
+            const childrenIds = family.nodes[partnerId].childrenIds;
+            if (childrenIds) {
+               for (let i = 0; i < childrenIds.length; i++) {
+                  family.addChildNode({
+                     mid: uniqueId,
+                     ...family.nodes[childrenIds[i]]
+                  });
+               }
+            }
+            setPartnetMap((prevMap) => {
+               if (prevMap) {
+                  prevMap.set(partnerId, uniqueId);
+                  prevMap.set(uniqueId, partnerId);
+               }
+               return prevMap;
+            });
+            console.log(family.nodes);
+         }
       }
    };
 
    useEffect(() => {
       if (treeRef.current && !familyRef.current) {
          const editFormInstance = new editForm();
-         //editFormInstance.setAddPartnerCallback(handleAddPartner);
+         editFormInstance.setAddPartnerCallback(handleAddPartner);
          editFormInstance.setAddChildCallback(handleAddChild);
 
          const familyInstance = new FamilyTree(treeRef.current, {
@@ -126,9 +96,6 @@ const Tree: React.FC<TreeProps> = ({ nodes }) => {
             },
             nodes: nodes
          });
-         // if (familyInstance) {
-         //    familyInstance.editUI.init(familyInstance);
-         // }
          familyRef.current = familyInstance;
       }
    }, [nodes]);
